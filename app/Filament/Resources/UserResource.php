@@ -98,4 +98,5 @@ class UserResource extends Resource
     {
         return static::$titlePanel;
     }
+
 }
