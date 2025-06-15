@@ -59,7 +59,7 @@ class BrandResource extends Resource
                         ->required()
                         ->default(true)
                 ])
-            ])->getLabel('Marca');
+            ]);
     }
 
     public static function table(Table $table): Table

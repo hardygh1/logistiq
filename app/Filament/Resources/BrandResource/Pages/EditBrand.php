@@ -10,6 +10,8 @@ class EditBrand extends EditRecord
 {
     protected static string $resource = BrandResource::class;
 
+    protected static ?string $title = 'Actualizar una marca';
+
     protected function getHeaderActions(): array
     {
         return [

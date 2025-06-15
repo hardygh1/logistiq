@@ -13,8 +13,7 @@ class ListBrands extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()
-            ->label('Nueva Marca'),
+            Actions\CreateAction::make()->label('Crear Marca'),
         ];
     }
 }
