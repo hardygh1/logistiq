@@ -20,9 +20,11 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\SelectColumn;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\ToggleButtons;
 use App\Filament\Resources\OrderResource\Pages;
+use App\Filament\Resources\OrderResource\RelationManagers\AddressRelationManager;
 
 class OrderResource extends Resource
 {
@@ -178,7 +180,35 @@ class OrderResource extends Resource
                 TextColumn::make('shipping_method')
                 ->label('Metodo de Envio')
                 ->searchable(),
-
+                SelectColumn::make('payment_status')
+                    ->placeholder('Selecciona una opción')
+                    ->options([
+                        'pending' => 'Pendiente',
+                        'paid' => 'Pagado',
+                        'failled' => 'Fallido'
+                    ])
+                    ->searchable()
+                    ->sortable(),
+                SelectColumn::make('status')
+                    ->placeholder('Selecciona una opción')
+                    ->options([
+                        'nuevo'=> 'Nuevo',
+                        'procesando' => 'Procesando',
+                        'enviado'=>'Enviado',
+                        'entregado'=>'Entregado',
+                        'cancelado'=>'Cancelado'
+                    ])
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('created_at')
+                    ->label('Fecha de Creación')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('updated_at')
+                    ->label('Fecha de Actualización')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true)
             ])
             ->filters([
                 //
@@ -198,6 +228,7 @@ class OrderResource extends Resource
     {
         return [
             //
+            AddressRelationManager::class
         ];
     }
 
