@@ -1,37 +1,29 @@
 <?php
 
-namespace App\Filament\Resources\UserResource\RelationManagers;
+namespace App\Filament\Widgets;
 
-use App\Filament\Resources\OrderResource;
-use Filament\Forms;
 use Filament\Tables;
 use App\Models\Order;
-use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables\Columns\BadgeColumn;
 
-class OrdersRelationManager extends RelationManager
+use App\Filament\Resources\OrderResource;
+use Filament\Widgets\TableWidget as BaseWidget;
+
+class LatestOrders extends BaseWidget
 {
-    protected static string $relationship = 'orders';
-
-    public function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('id')
-                    ->required()
-                    ->maxLength(255),
-            ]);
-    }
+    protected int |string | array $columnSpan = 'full';
+    protected static ?int $sort = 1;
+    protected static ?string $heading = 'Últimos pedidos';
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('id')
+            ->query(OrderResource::getEloquentQuery())
+            ->defaultPaginationPageOption(5)
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('id')
                 ->label('Código')
@@ -62,41 +54,42 @@ class OrdersRelationManager extends RelationManager
                     ->sortable(),
 
                 TextColumn::make('payment_method')
-                    ->badge()
-                    ->label('Metodo de Pago')
-                    ->sortable(),
+                ->badge()
+                ->formatStateUsing(fn ($state) => match ($state) {
+                    'cash' => 'Efectivo',
+                    'yape' => 'Yape',
+                    'plin' => 'Plin',
+                    'transfer' => 'Transferencia',
+                    default => ucfirst($state),
+                })
+                ->extraAttributes(fn ($state) => match ($state) {
+                    'yape' => ['class' => 'bg-purple-500 text-white'],
+                    'cash' => ['class' => 'bg-green-500 text-white'],
+                    'plin' => ['class' => 'bg-blue-400 text-white'],
+                    'transfer' => ['class' => 'bg-yellow-400 text-black'],
+                    default => ['class' => 'bg-gray-300 text-black'],
+                }),
+
                 TextColumn::make('payment_status')
                     ->badge()
+                    ->label('Estado de Pago')
                     ->color(fn (string $state): string => match ($state) {
+                        'pendiente' => 'warning',
                         'pagado' => 'success',
-                        'pediente' => 'warning',
                         'fallido' => 'danger',
                     })
-                    ->label('Estado de Pago')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->label('Fecha de Creación')
                     ->sortable(),
             ])
-            ->filters([
-                //
-            ])
-            ->headerActions([
-                //Tables\Actions\CreateAction::make(),
-            ])
             ->actions([
                 //Tables\Actions\EditAction::make(),
                 Action::make('Ver pedido')
                     ->url(fn (Order $record): string => OrderResource::getUrl('view', ['record' => $record->id]))
-                    ->color('info')
+                    ->color('primary')
                     ->icon('heroicon-o-eye'),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }

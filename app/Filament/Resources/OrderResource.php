@@ -48,14 +48,16 @@ class OrderResource extends Resource
                         ->required(),
                         Select::make('payment_method')
                         ->options([
-                            'stripe'=> 'Stripe',
-                            'cod'=>'Cash on Delivery'
+                            'efectivo' => 'Efectivo',
+                            'yape' => 'Yape',
+                            'transferencia' => 'Transferencia',
+                            'plin' => 'Plin',
                         ])->required(),
                         Select::make('payment_status')
                             ->options([
-                                'pending' => 'Pendiente',
-                                'paid' => 'Pagado',
-                                'failled' => 'Fallido'
+                                'pendiente' => 'Pendiente',
+                                'pagado' => 'Pagado',
+                                'fallido' => 'Fallido'
                             ])
                             ->default('pending')
                             ->required(),
